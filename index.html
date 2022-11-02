@@ -175,7 +175,7 @@ function minimax(board, depth, maximizing_player) {
                 const column_score = minimax(new_board, depth - 1, true);
                 if (column_score < lowest_column_score) lowest_column_score = column_score;
             }
-            dice_scores.push(highest_column_score);
+            dice_scores.push(lowest_column_score);
         }
         // median score for each dice given best dice position
         // never use mean for heavy tailed distributions
