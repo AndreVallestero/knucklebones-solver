@@ -10,7 +10,12 @@ Try it out at https://andrevallestero.github.io/knucklebones-solver/
   - rewrite in rust -> wasm
   - tail call recursion optimization
   - manually rewrite recursion as a loop
-  - multi-threading (each branch after depth n-2 should be split into it's own thread allowing us to leverage up to 54 threads (3x6x3)
+  - configurable multi-threading
+    - choose which depth (x) to start multithreading
+    - at depth - 0, disable multithreading
+    - at depth - 1, use 3 threads
+    - at depth - 2, use 54 threads (3x6x3), etc...
+    - alpha-beta pruning should start after splitting off into its own threads as it requires thread locality, as such, threads should not exceeded number of cores on computer.
   - profiling and micro optimizations
 - implement auto-place (button to automatically place the suggested position)
   - this should also remove dice from the opponent's board if necessary
