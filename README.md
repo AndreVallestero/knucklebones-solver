@@ -1,7 +1,9 @@
 # knucklebones-solver
-Knucklebones Solver using minimax and mean-weighting for random probabilities
+Knucklebones Solver using minimax and median-weighting for random probabilities
 
-Try it out at https://andrevallestero.github.io/knucklebones-solver/
+Check it out here: https://andrevallestero.github.io/knucklebones-solver/
+
+Test it in game here: https://knucklebones.jaredp.co.uk/
 
 ## TODO
 - optimize
