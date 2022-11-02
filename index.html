@@ -1,0 +1,234 @@
+<head>
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        td>input {
+            width: 50px;
+        }
+
+        #center>* {
+            margin: auto;
+            text-align: center
+        }
+
+        body {
+            font-family: sans-serif;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        #center {
+            position: relative;
+            top: 50%;
+            -webkit-transform: translateY(-50%);
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<div id="center">
+    <h1>Knucklebones Solver</h1>
+    <div>Opponent board</div>
+    <table id="grid1">
+        <tr>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+        </tr>
+        <tr>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+        </tr>
+        <tr>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+        </tr>
+    </table>
+    <br>
+    <div>Your board</div>
+    <table id="grid0">
+        <tr>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+        </tr>
+        <tr>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+        </tr>
+        <tr>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+            <td><input type="number"></td>
+        </tr>
+    </table>
+    <br>
+    <div><input id="roll" type="number" placeholder="Your roll"></div>
+    <div><input id="depth" type="number" placeholder="Search depth [4]"></div>
+    <br>
+    <div><button onclick="btn_solve_clicked()">Solve</button></div>
+    <br>
+    <div>Place dice: <span id="column"></span></div>
+    <br>
+    <div>Expected advantage in <span id="out_depth">?</span> moves: <span id="score"></span></div>
+</div>
+<script>
+
+const COLUMN_REPR = ["Left", "Center", "Right"];
+
+function sum(arr) {
+    return arr.reduce((a, b) => a + b, 0);
+}
+
+class Board {
+    constructor(grids) {
+        // Columns are an Array(6) where each value is the 
+        //   number of instances of that number in that column
+        this.grids = grids !== undefined ? grids : [
+            [], [] // Opponent
+        ];
+        for (let i = 0; i < 2; ++i)
+            for (let j = 0; j < 3; ++j)
+                this.grids[i].push(new Array(6).fill(0))
+    }
+
+    place(number, grid_index, column_index) {
+        if (number < 1 || number > 6) {
+            console.error("Placing number", number, "is invalid");
+            return;
+        }
+
+        const column = this.grids[grid_index][column_index];
+        if (sum(column) > 2) {
+            console.error("Tried to place number in full column");
+            return;
+        }
+
+        // -1 to access the index
+        ++column[number - 1]; // +1 to selected grid
+        this.grids[1-grid_index][column_index][number - 1] = 0 // reset other grid counter
+    }
+
+    eval() {
+        let score = sum(this.grids[0].map(this.eval_column));
+        score -= sum(this.grids[1].map(this.eval_column));
+        return score;
+    }
+
+    eval_column(column) {
+        let sum = 0;
+        for (const [i, count] of column.entries()) 
+            sum += (i + 1) * count * count;
+        return sum;
+    }
+
+    is_game_over() {
+        for (let i = 0; i < 2; ++i) 
+            if (sum(this.grids[i].map(sum)) == 9)
+                return true;
+        return false
+    }
+
+    is_column_full(grid_index, column_index) {
+        return sum(this.grids[grid_index][column_index]) == 3
+    }
+}
+
+function minimax(board, depth, maximizing_player) {
+    if (depth == 0 || board.is_game_over()) {
+        const eval = board.eval()
+        return eval
+    }
+
+    if (maximizing_player) {
+        let total_dice_score = 0;
+        for (let dice = 1; dice < 7; ++dice) {
+            let highest_column_score = Number.NEGATIVE_INFINITY;
+            for (let column_index = 0; column_index < 3; ++column_index) {
+                if (board.is_column_full(0, column_index)) continue; // skip full column
+
+                const new_board = new Board(structuredClone(board.grids));
+                new_board.place(dice, 0, column_index);
+                const column_score = minimax(new_board, depth - 1, false);
+                if (column_score > highest_column_score) highest_column_score = column_score;
+            }
+            total_dice_score += highest_column_score;
+        }
+        return total_dice_score / 6; // average score for each dice given best dice position
+    } else {
+        let total_dice_score = 0;
+        for (let dice = 1; dice < 7; ++dice) {
+            let lowest_column_score = Number.POSITIVE_INFINITY;
+            for (let column_index = 0; column_index < 3; ++column_index) {
+                if (board.is_column_full(1, column_index)) continue; // skip full column
+
+                const new_board = new Board(structuredClone(board.grids));
+                new_board.place(dice, 1, column_index);
+                const column_score = minimax(new_board, depth - 1, true);
+                if (column_score < lowest_column_score) lowest_column_score = column_score;
+            }
+            total_dice_score += lowest_column_score;
+        }
+        return total_dice_score / 6; // average score for each dice given best dice position
+    }
+}
+
+function solve(board, depth, roll) {
+    let highest_column = null;
+    let highest_column_score = Number.NEGATIVE_INFINITY;
+    for (let column_index = 0; column_index < 3; ++column_index) {
+        if (board.is_column_full(0, column_index)) continue; // skip full column
+
+        const new_board = new Board(structuredClone(board.grids));
+        new_board.place(roll, 0, column_index);
+        const column_score = minimax(new_board, depth, false);
+        if (column_score > highest_column_score) {
+            highest_column_score = column_score;
+            highest_column = column_index;
+        }
+    }
+    return [highest_column, highest_column_score];
+}
+
+function btn_solve_clicked() {
+    const roll_string = document.getElementById("roll").value.trim();
+    if (roll_string.length === 0) return console.error("Invalid roll");
+    const roll = parseInt(roll_string)
+
+    const depth_string = document.getElementById("depth").value.trim();
+    let depth;
+    if (depth_string.length === 0) depth = 4;
+    else depth = parseInt(depth_string)
+
+    const board = new Board();
+    for (let grid_index = 0; grid_index < 2; ++grid_index) {
+        const rows = document.getElementById("grid"+grid_index).lastChild.children;
+        for (const row of rows) {
+            const cells = Array.from(row.getElementsByTagName("input"));
+            for (const [column_index, cell] of cells.entries()) {
+                const value = cell.value.trim();
+                if (value.length === 0) continue;
+                board.place(parseInt(value), grid_index, column_index)
+            }
+        }
+    }
+
+    const [highest_column, highest_column_score] = solve(board, depth, roll)
+
+    document.getElementById("column").innerText = COLUMN_REPR[highest_column];
+    document.getElementById("out_depth").innerText = depth;
+    document.getElementById("score").innerText = Math.round(highest_column_score * 100) / 100;
+}
+</script>
