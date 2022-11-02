@@ -166,9 +166,10 @@ function minimax(board, depth, maximizing_player) {
             }
             dice_scores.push(highest_column_score);
         }
-		// median score for each dice given best dice position
-		// never use mean for heavy tailed distributions
-		// this is heavy tailed because of score multiplication
+        // median score for each dice given best dice position
+        // never use mean for heavy tailed distributions
+        // this is heavy tailed because of score multiplication
+	dice_scores.sort();
         return (dice_scores[2] + dice_scores[3]) / 2; 
     } else {
         const dice_scores = [];
@@ -185,8 +186,9 @@ function minimax(board, depth, maximizing_player) {
             dice_scores.push(highest_column_score);
         }
         // median score for each dice given best dice position
-		// never use mean for heavy tailed distributions
-		// this is heavy tailed because of score multiplication
+        // never use mean for heavy tailed distributions
+        // this is heavy tailed because of score multiplication
+	dice_scores.sort();
         return (dice_scores[2] + dice_scores[3]) / 2; 
     }
 }
