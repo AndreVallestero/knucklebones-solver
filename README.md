@@ -1,6 +1,8 @@
 # knucklebones-solver
 Knucklebones Solver using minimax and mean-weighting for random probabilities
 
+Try it out at https://andrevallestero.github.io/knucklebones-solver/
+
 ## TODO
 - optimize
   - alpha-beta pruning
