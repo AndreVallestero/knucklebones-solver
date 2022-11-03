@@ -76,7 +76,7 @@
     </table>
     <br>
     <div><input id="roll" type="number" placeholder="Your roll"></div>
-    <div><input id="depth" type="number" placeholder="Search depth [4]"></div>
+    <div><input id="depth" type="number" placeholder="Search depth [6]"></div>
     <br>
     <div><button onclick="btn_solve_clicked()">Solve</button></div>
     <br>
@@ -90,16 +90,26 @@ const COLUMN_REPR = ["Left", "Center", "Right"];
 function sum(arr) {
     return arr.reduce((a, b) => a + b, 0);
 }
+
+// Micro optimization, 100x faster than structured clone, 2x faster than loop + slice
+function clone_grids(grids) {
+    const grid0 = grids[0], grid1 = grids[1];
+    return [[grid0[0].slice(), grid0[1].slice(), grid0[2].slice()],
+        [grid1[0].slice(), grid1[1].slice(), grid1[2].slice()]];
+}
+
 class Board {
     constructor(grids) {
         // Columns are an Array(6) where each value is the 
         //   number of instances of that number in that column
-        this.grids = grids !== undefined ? grids : [
-            [],
-            [] // Opponent
-        ];
-        for (let i = 0; i < 2; ++i)
-            for (let j = 0; j < 3; ++j) this.grids[i].push(new Array(6).fill(0))
+        if (grids !== undefined) {
+            this.grids = grids;
+        } else {
+            this.grids = [[],[]];
+            for (let i = 0; i < 2; ++i)
+                for (let j = 0; j < 3; ++j)
+                    this.grids[i].push(new Array(6).fill(0))
+        }
     }
 
     place(number, grid_index, column_index) {
@@ -118,15 +128,15 @@ class Board {
     }
 
     eval() {
-        let score = sum(this.grids[0].map(this.eval_column));
-        score -= sum(this.grids[1].map(this.eval_column));
-        return score;
+        return sum(this.grids[0].map(this.eval_column))
+            - sum(this.grids[1].map(this.eval_column));
     }
 
     eval_column(column) {
-        let sum = 0;
-        for (const [i, count] of column.entries()) sum += (i + 1) * count * count;
-        return sum;
+        let total = 0;
+        for (let i = 0; i < 6; ++i)
+            total += (i + 1) * column[i] * column[i];
+        return total;
     }
 
     is_game_over() {
@@ -136,53 +146,42 @@ class Board {
     }
 
     is_column_full(grid_index, column_index) {
-        return sum(this.grids[grid_index][column_index]) == 3
+        return sum(this.grids[grid_index][column_index]) == 3;
     }
 }
 
 function minimax(board, depth, maximizing_player) {
-    if (depth == 0 || board.is_game_over()) {
-        const eval = board.eval()
-        return eval
-    }
+    if (depth == 0 || board.is_game_over()) return board.eval();
 
+    const roll_scores = [];
     if (maximizing_player) {
-        const dice_scores = [];
-        for (let dice = 1; dice < 7; ++dice) {
+        for (let roll = 1; roll < 7; ++roll) {
             let highest_column_score = Number.NEGATIVE_INFINITY;
             for (let column_index = 0; column_index < 3; ++column_index) {
-                if (board.is_column_full(0, column_index)) continue; // skip full column
-                const new_board = new Board(structuredClone(board.grids));
-                new_board.place(dice, 0, column_index);
-                const column_score = minimax(new_board, depth - 1, false);
-                if (column_score > highest_column_score) highest_column_score = column_score;
+                if (board.is_column_full(0, column_index)) continue;
+                const new_board = new Board(clone_grids(board.grids));
+                new_board.place(roll, 0, column_index);
+                highest_column_score = Math.max(highest_column_score, minimax(new_board, depth - 1, false));
             }
-            dice_scores.push(highest_column_score);
+            roll_scores.push(highest_column_score);
         }
-        // median score for each dice given best dice position
-        // never use mean for heavy tailed distributions
-        // this is heavy tailed because of score multiplication
-        dice_scores.sort();
-        return (dice_scores[2] + dice_scores[3]) / 2;
     } else {
-        const dice_scores = [];
-        for (let dice = 1; dice < 7; ++dice) {
+        for (let roll = 1; roll < 7; ++roll) {
             let lowest_column_score = Number.POSITIVE_INFINITY;
             for (let column_index = 0; column_index < 3; ++column_index) {
-                if (board.is_column_full(1, column_index)) continue; // skip full column
-                const new_board = new Board(structuredClone(board.grids));
-                new_board.place(dice, 1, column_index);
-                const column_score = minimax(new_board, depth - 1, true);
-                if (column_score < lowest_column_score) lowest_column_score = column_score;
+                if (board.is_column_full(1, column_index)) continue;
+                const new_board = new Board(clone_grids(board.grids));
+                new_board.place(roll, 1, column_index);
+                lowest_column_score = Math.min(lowest_column_score, minimax(new_board, depth - 1, true));
             }
-            dice_scores.push(lowest_column_score);
+            roll_scores.push(lowest_column_score);
         }
-        // median score for each dice given best dice position
-        // never use mean for heavy tailed distributions
-        // this is heavy tailed because of score multiplication
-        dice_scores.sort();
-        return (dice_scores[2] + dice_scores[3]) / 2;
     }
+    // median score for each roll given best dice position
+    // never use mean for heavy tailed distributions
+    // this is heavy tailed because of score multiplication
+    roll_scores.sort();
+    return (roll_scores[2] + roll_scores[3]) / 2;
 }
 
 function solve(board, depth, roll) {
@@ -190,7 +189,7 @@ function solve(board, depth, roll) {
     let highest_column_score = Number.NEGATIVE_INFINITY;
     for (let column_index = 0; column_index < 3; ++column_index) {
         if (board.is_column_full(0, column_index)) continue; // skip full column
-        const new_board = new Board(structuredClone(board.grids));
+        const new_board = new Board(clone_grids(board.grids));
         new_board.place(roll, 0, column_index);
         const column_score = minimax(new_board, depth, false);
         if (column_score > highest_column_score) {
@@ -208,7 +207,7 @@ function btn_solve_clicked() {
 
     const depth_string = document.getElementById("depth").value.trim();
     let depth;
-    if (depth_string.length === 0) depth = 4;
+    if (depth_string.length === 0) depth = 6;
     else depth = parseInt(depth_string)
 
     const board = new Board();
@@ -224,9 +223,20 @@ function btn_solve_clicked() {
         }
     }
 
-    const [highest_column, highest_column_score] = solve(board, depth, roll)
+    const start = Date.now();
+    var [highest_column, highest_column_score] = solve(board, depth, roll)
+    console.log("Elapsed:", Math.round((Date.now() - start)));
+
     document.getElementById("column").innerText = COLUMN_REPR[highest_column];
     document.getElementById("out_depth").innerText = depth;
     document.getElementById("score").innerText = Math.round(highest_column_score * 100) / 100;
 }
+
+function test() {
+    const grids = [[[0,0,0,0,0,2],[0,0,0,0,0,0],[0,0,0,0,0,0]],[[0,0,0,0,0,0],[1,0,1,0,1,0],[0,1,0,1,0,0]]];
+    const start = Date.now();
+    for (let i=10000000; --i;) clone_grids(grids)
+    console.log("Clone elapsed:", Math.round((Date.now() - start)));
+}
+
 </script>
