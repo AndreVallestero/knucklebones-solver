@@ -76,7 +76,7 @@
     </table>
     <br>
     <div><input id="roll" type="number" placeholder="Your roll"></div>
-    <div><input id="depth" type="number" placeholder="Search depth [6]"></div>
+    <div><input id="depth" type="number" placeholder="Search depth [5]"></div>
     <br>
     <div><button onclick="btn_solve_clicked()">Solve</button></div>
     <br>
@@ -207,7 +207,7 @@ function btn_solve_clicked() {
 
     const depth_string = document.getElementById("depth").value.trim();
     let depth;
-    if (depth_string.length === 0) depth = 6;
+    if (depth_string.length === 0) depth = 5;
     else depth = parseInt(depth_string)
 
     const board = new Board();
