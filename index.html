@@ -201,14 +201,6 @@ function solve(board, depth, roll) {
 }
 
 function btn_solve_clicked() {
-    const column_node = document.getElementById("column");
-    const depth_node = document.getElementById("out_depth");
-    const score_node = document.getElementById("score");
-
-    column_node.innerText = "";
-    depth_node.innerText = "?";
-    score_node.innerText = "";
-    
     const roll_string = document.getElementById("roll").value.trim();
     if (roll_string.length === 0) return console.error("Invalid roll");
     const roll = parseInt(roll_string)
@@ -235,9 +227,9 @@ function btn_solve_clicked() {
     const [highest_column, highest_column_score] = solve(board, depth, roll);
     console.log("Elapsed:", Math.round((Date.now() - start)));
 
-    column_node.innerText = COLUMN_REPR[highest_column];
-    depth_node.innerText = depth;
-    score_node.innerText = Math.round(highest_column_score * 100) / 100;
+    document.getElementById("column").innerText = COLUMN_REPR[highest_column];
+    document.getElementById("out_depth").innerText = depth;
+    document.getElementById("score").innerText = Math.round(highest_column_score * 100) / 100;
 }
 
 function test() {
