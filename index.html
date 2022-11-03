@@ -224,7 +224,7 @@ function btn_solve_clicked() {
     }
 
     const start = Date.now();
-    var [highest_column, highest_column_score] = solve(board, depth, roll)
+    const [highest_column, highest_column_score] = solve(board, depth, roll);
     console.log("Elapsed:", Math.round((Date.now() - start)));
 
     document.getElementById("column").innerText = COLUMN_REPR[highest_column];
