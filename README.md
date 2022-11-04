@@ -17,6 +17,8 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
   - [ ] tail call recursion optimization
   - [ ] manually rewrite recursion as a loop
   - [ ] profiling and micro optimizations
+    - [ ] optimize for branch predictor (test branchless)
+    - [ ] optimize for memory locality / reduce cache misses
 - implement auto-place (button to automatically place the suggested position)
   - this should also remove dice from the opponent's board if necessary
 - add reset button
