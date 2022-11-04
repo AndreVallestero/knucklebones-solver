@@ -11,7 +11,7 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
   - [x] ~~{40x speedup} alpha beta pruning~~ (not possible due to roll median algorithm)
   - [x] (659ms, 70x speedup) profiling and optimizations 
   - [x] (260ms, 2.5x speedup) use flat array for grids
-  - [ ] use [Uint8/16/32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) which might let us leverage `.reduce()` for sum without needing a slice/memcpy
+  - [x] ~~use [Uint8/16/32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) which might let us leverage `.reduce()`~~ copying `TypedArray` is slower than `Array`
   - [ ] web worker / multithreading (split 3 top branches into its own webworker)
   - [ ] configurable web worker / multithreading (4+ threads)
   - [ ] rewrite in rust -> wasm
@@ -43,4 +43,3 @@ After finishing first round of optimizations: Note, `clone_grids()` is now takin
 
 After using a flat array for grids: Note, `clone_grids()` was removed and memcpy now takes up significantly less of the runtime because of this optimization. We are near the edge of what JS performance can be.
 ![image](https://user-images.githubusercontent.com/39736205/200007470-b7b1c4ad-e7e7-4e9b-9e43-a62fa22823ee.png)
-
