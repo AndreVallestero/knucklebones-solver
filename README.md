@@ -26,12 +26,12 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 
 ## Cool Profiling Flamegraphs
 
-Baseline:
+Baseline: Note, structuredClone and eval_column take up the majority of the runtime. structuredClone was replaced with a custom clone_grids, and eval_column was slow because of `.entries()` which I replaced with regular indexing.
 ![image](https://user-images.githubusercontent.com/39736205/199864435-0aa6fb2b-db7b-4377-9e4d-13558d8f2fd5.png)
 
-After clone_grids optimization:
+After implementing both of those optimizations:
 ![image](https://user-images.githubusercontent.com/39736205/199863882-f3516b19-e088-4215-bb9e-696c9ba5fbe6.png)
 
-After finishing first round of optimizations, note clone_grids is now taking up 40% of the runtime, if this were C, this would happen in a single memcpy and would likely be 1% of the runtime, hence why I wanted to try storing the grids in a flat array next, that way I could use a single array.slice() which maps to memcpy:
+After finishing first round of optimizations: Note, clone_grids is now taking up 40% of the runtime, if this were C, this would happen in a single memcpy and would likely be 1% of the runtime, hence why I wanted to try storing the grids in a flat array next, that way I could use a single array.slice() which maps to memcpy.
 ![image](https://user-images.githubusercontent.com/39736205/199864034-99848ba2-fd9b-4cbd-bf78-eda8b02043b6.png)
 
