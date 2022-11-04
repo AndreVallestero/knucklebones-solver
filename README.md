@@ -11,7 +11,7 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
   - [x] ~~{40x speedup} alpha beta pruning~~ (not possible due to roll median algorithm)
   - [x] (659ms, 70x speedup) profiling and optimizations 
   - [x] (260ms, 2.5x speedup) use flat array for grids
-  - [ ] use [Uint8/16/32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) which might let us leverage reduce for sum without needing a slice/memcpy
+  - [ ] use [Uint8/16/32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) which might let us leverage `.reduce()` for sum without needing a slice/memcpy
   - [ ] web worker / multithreading (split 3 top branches into its own webworker)
   - [ ] configurable web worker / multithreading (4+ threads)
   - [ ] rewrite in rust -> wasm
