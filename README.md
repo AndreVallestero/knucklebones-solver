@@ -9,8 +9,8 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 - optimize
   - [x] (45421ms) baseline
   - [x] ~~{40x speedup} alpha beta pruning~~ (not possible due to roll median algorithm)
-  - [x] (649ms, 70x speedup) profiling and optimizations 
-  - [ ] use flat array for grids
+  - [x] (659ms, 70x speedup) profiling and optimizations 
+  - [x] (260ms, 2.5x speedup) use flat array for grids
   - [ ] web worker / multithreading (split 3 top branches into its own webworker)
   - [ ] configurable web worker / multithreading (4+ threads)
   - [ ] rewrite in rust -> wasm
