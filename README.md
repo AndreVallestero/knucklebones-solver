@@ -7,7 +7,7 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 
 ## TODO
 - optimize
-  - [x] ~~{40x speedup} alphabeta pruning~~ (not possible due to roll median algorithm)
+  - [x] ~~{40x speedup} alpha beta pruning~~ (not possible due to roll median algorithm)
   - [x] (200x speedup) profiling and optimizations 
   - [ ] use flat array for grids
   - [ ] web worker / multithreading (split 3 top branches into its own webworker)
