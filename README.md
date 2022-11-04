@@ -12,6 +12,7 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
   - [x] (649ms, 70x speedup) profiling and optimizations 
   - [ ] use flat array for grids
   - [ ] web worker / multithreading (split 3 top branches into its own webworker)
+  - [ ] configurable web worker / multithreading (4+ threads)
   - [ ] rewrite in rust -> wasm
   - [ ] tail call recursion optimization
   - [ ] manually rewrite recursion as a loop
