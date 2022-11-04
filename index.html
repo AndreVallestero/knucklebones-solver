@@ -98,6 +98,16 @@ function clone_grids(grids) {
         [grid1[0].slice(), grid1[1].slice(), grid1[2].slice()]];
 }
 
+// Micro optimization, 4x faster than arr.sort() for n=6
+function insertion_sort(arr) {
+    for(let i=1; i<6; ++i) {
+		const value = arr[i];
+		for (var j=i-1; 0 <= j && arr[j] <= value; j--) 
+			arr[j+1] = arr[j];
+		arr[j+1] = value;
+	}
+}
+
 class Board {
     constructor(grids) {
         // Columns are an Array(6) where each value is the 
@@ -113,30 +123,21 @@ class Board {
     }
 
     place(number, grid_index, column_index) {
-        if (number < 1 || number > 6) {
-            console.error("Placing number", number, "is invalid");
-            return;
-        }
-        const column = this.grids[grid_index][column_index];
-        if (sum(column) > 2) {
-            console.error("Tried to place number in full column");
-            return;
-        }
-        // -1 to access the index
-        ++column[number - 1]; // +1 to selected grid
-        this.grids[1 - grid_index][column_index][number - 1] = 0 // reset other grid counter
+        ++this.grids[grid_index][column_index][number - 1]; // +1 to selected grid
+        this.grids[1 - grid_index][column_index][number - 1] = 0; // reset other grid counter
     }
 
+    // Micro optimization, 2x faster than map + sum + eval_column
     eval() {
-        return sum(this.grids[0].map(this.eval_column))
-            - sum(this.grids[1].map(this.eval_column));
-    }
-
-    eval_column(column) {
         let total = 0;
-        for (let i = 0; i < 6; ++i)
-            total += (i + 1) * column[i] * column[i];
-        return total;
+        const grid0 = this.grids[0], grid1 = this.grids[1];
+        for (let i = 0; i < 3; ++i) {
+            for (let j = 0; j < 6; ++j) {
+                total += (j + 1) * grid0[i][j] * grid0[i][j];
+                total -= (j + 1) * grid1[i][j] * grid1[i][j];
+            }
+        }
+        return total
     }
 
     is_game_over() {
@@ -180,7 +181,7 @@ function minimax(board, depth, maximizing_player) {
     // median score for each roll given best dice position
     // never use mean for heavy tailed distributions
     // this is heavy tailed because of score multiplication
-    roll_scores.sort();
+    insertion_sort(roll_scores);
     return (roll_scores[2] + roll_scores[3]) / 2;
 }
 
@@ -234,9 +235,13 @@ function btn_solve_clicked() {
 
 function test() {
     const grids = [[[0,0,0,0,0,2],[0,0,0,0,0,0],[0,0,0,0,0,0]],[[0,0,0,0,0,0],[1,0,1,0,1,0],[0,1,0,1,0,0]]];
+    const board = new Board(grids);
     const start = Date.now();
-    for (let i=10000000; --i;) clone_grids(grids)
-    console.log("Clone elapsed:", Math.round((Date.now() - start)));
+    const roll_results = [ -12, -17, -20, -23, -16, -29 ];
+    for (let i=10000000; i--;) {
+        insertion_sort([ -12, -17, -20, -23, -16, -29 ]);
+    }
+    console.log("Test elapsed:", Math.round((Date.now() - start)));
 }
 
 </script>
