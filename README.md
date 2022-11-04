@@ -24,3 +24,14 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 
 ![image](https://user-images.githubusercontent.com/39736205/199863284-35712a55-cf26-4e6b-b2d6-967e1b02b5c3.png)
 
+## Cool Profiling Flamegraphs
+
+Baseline:
+![image](https://user-images.githubusercontent.com/39736205/199863903-bac035fa-8b1d-4db5-a294-6aa4cda3f836.png)
+
+After clone_grids optimization:
+![image](https://user-images.githubusercontent.com/39736205/199863882-f3516b19-e088-4215-bb9e-696c9ba5fbe6.png)
+
+After finishing first round of optimizations, note clone_grids is now taking up 40% of the runtime, if this were C, this would happen in a single memcpy and would likely be 1% of the runtime, hence why I wanted to try storing the grids in a flat array next, that way I could use a single array.slice() which maps to memcpy:
+![image](https://user-images.githubusercontent.com/39736205/199864034-99848ba2-fd9b-4cbd-bf78-eda8b02043b6.png)
+
