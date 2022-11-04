@@ -24,6 +24,8 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 
 ![image](https://user-images.githubusercontent.com/39736205/199863284-35712a55-cf26-4e6b-b2d6-967e1b02b5c3.png)
 
+This config with depth=5 results in minimax being called 1,194,069 times
+
 ## Cool Profiling Flamegraphs
 
 Baseline: Note, `structuredClone()` and `eval_column()` take up the majority of the runtime. `structuredClone()` was replaced with a custom `clone_grids()`, and eval_column was slow because of `.entries()` which I replaced with regular indexing.
