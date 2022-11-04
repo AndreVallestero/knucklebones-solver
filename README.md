@@ -27,7 +27,7 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 ## Cool Profiling Flamegraphs
 
 Baseline:
-![image](https://user-images.githubusercontent.com/39736205/199863903-bac035fa-8b1d-4db5-a294-6aa4cda3f836.png)
+![image](https://user-images.githubusercontent.com/39736205/199864435-0aa6fb2b-db7b-4377-9e4d-13558d8f2fd5.png)
 
 After clone_grids optimization:
 ![image](https://user-images.githubusercontent.com/39736205/199863882-f3516b19-e088-4215-bb9e-696c9ba5fbe6.png)
