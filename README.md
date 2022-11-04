@@ -31,7 +31,7 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 
 This config with depth=5 results in minimax being called 1,194,069 times
 
-## Cool Profiling Flamegraphs
+## Cool Profiling Flamegraphs and Other Notes
 
 Baseline: Note, `structuredClone()` and `eval_column()` take up the majority of the runtime. `structuredClone()` was replaced with a custom `clone_grids()`, and eval_column was slow because of `.entries()` which I replaced with regular indexing.
 ![image](https://user-images.githubusercontent.com/39736205/199864435-0aa6fb2b-db7b-4377-9e4d-13558d8f2fd5.png)
@@ -44,3 +44,5 @@ After finishing first round of optimizations: Note, `clone_grids()` is now takin
 
 After using a flat array for grids: Note, `clone_grids()` was removed and memcpy now takes up significantly less of the runtime because of this optimization. We are near the edge of what JS performance can be.
 ![image](https://user-images.githubusercontent.com/39736205/200007470-b7b1c4ad-e7e7-4e9b-9e43-a62fa22823ee.png)
+
+While implementing web workers, I learned that class function are significantly faster than standalone functions if you're storing the data in the class. Because the workers used `structuredClone` to receive data, this would strip away the Board class so I decided making all the functions standalone. This classless implementation was 3x slower than the original. After some research, I found out that classes are able to JIT the function for the specific data types in its internal fields, which results in large performance gains. In the next version, I'm gonna try implementing the functions in the Array prototype to reduce indirection and improve performance.
