@@ -40,6 +40,6 @@ After implementing both of those optimizations:
 After finishing first round of optimizations: Note, `clone_grids()` is now taking up 40% of the runtime. If this were C, this would happen in a single `memcpy()` and would likely be 1% of the runtime, hence why I wanted to try storing the grids in a flat array, which would let me use a single `[].slice()`, which maps to `memcpy()`.
 ![image](https://user-images.githubusercontent.com/39736205/199864034-99848ba2-fd9b-4cbd-bf78-eda8b02043b6.png)
 
-After using a flat array for grids: Note, `clone_grids()` and memcpy now takes up significantly less of the runtime because of this optimization. We are near the edge of what JS performance can be.
+After using a flat array for grids: Note, `clone_grids()` was removed and memcpy now takes up significantly less of the runtime because of this optimization. We are near the edge of what JS performance can be.
 ![image](https://user-images.githubusercontent.com/39736205/200007470-b7b1c4ad-e7e7-4e9b-9e43-a62fa22823ee.png)
 
