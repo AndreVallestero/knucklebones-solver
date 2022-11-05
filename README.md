@@ -23,9 +23,9 @@ Or play PVP: https://knucklebones.jaredp.co.uk/pvp
   - [ ] profiling and micro optimizations
     - [ ] optimize for branch predictor (test branchless)
     - [ ] optimize for memory locality / reduce cache misses
-- implement auto-place (button to automatically place the suggested position)
-  - this should also remove dice from the opponent's board if necessary
-- add reset button
+- [x] implement auto-place (button to automatically place the suggested position)
+  - [x] this should also remove dice from the opponent's board if necessary
+- [x] add reset button
 
 ## Reference Benchmark
 
