@@ -225,7 +225,10 @@ async function btn_solve_clicked() {
     const start = Date.now();
     const worker_promises = [];
     for (let column_index = 0; column_index < 3; ++column_index) {
-        if (board.is_column_full(0, column_index)) continue; // skip full column
+        if (board.is_column_full(0, column_index)) {
+            worker_promises.push(Number.NEGATIVE_INFINITY);
+            continue; // skip full column
+        }
         const new_board = new Board(board.grids.slice());
         new_board.place(roll, 0, column_index);
         worker_promises.push(worker_solve(workers[column_index], new_board.grids, depth));
