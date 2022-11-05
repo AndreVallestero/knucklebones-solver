@@ -5,6 +5,8 @@ Check it out here: https://andrevallestero.github.io/knucklebones-solver/
 
 Test it in game here: https://knucklebones.jaredp.co.uk/
 
+Or play PVP: https://knucklebones.jaredp.co.uk/pvp
+
 ## TODO
 - optimize
   - [x] (45421ms) baseline
