@@ -111,7 +111,7 @@ onmessage = function(event) {
 function minimax(board, depth, maximizing_player) {
     if (depth == 0 || board.is_game_over()) return board.eval();
 
-    const roll_scores = [];
+    const roll_scores = new Array(6);
     if (maximizing_player) {
         for (let roll = 1; roll < 7; ++roll) {
             let highest_column_score = Number.NEGATIVE_INFINITY;
@@ -121,7 +121,7 @@ function minimax(board, depth, maximizing_player) {
                 new_board.place(roll, 0, column_index);
                 highest_column_score = Math.max(highest_column_score, minimax(new_board, depth - 1, false));
             }
-            roll_scores.push(highest_column_score);
+            roll_scores[roll-1] = highest_column_score;
         }
     } else {
         for (let roll = 1; roll < 7; ++roll) {
@@ -132,7 +132,7 @@ function minimax(board, depth, maximizing_player) {
                 new_board.place(roll, 1, column_index);
                 lowest_column_score = Math.min(lowest_column_score, minimax(new_board, depth - 1, true));
             }
-            roll_scores.push(lowest_column_score);
+            roll_scores[roll-1] = lowest_column_score;
         }
     }
     // median score for each roll given best dice position
@@ -250,18 +250,21 @@ function worker_solve(worker, board, depth) {
 const blob_url = window.URL.createObjectURL(new Blob([worker_script.textContent]));
 const workers = [new Worker(blob_url), new Worker(blob_url), new Worker(blob_url)];
 
-
 function test() {
     const board = [
         0,0,0,0,0,2, 0,0,0,0,0,0, 0,0,0,0,0,0,
         0,0,0,0,0,0, 1,0,1,0,1,0, 0,1,0,1,0,0];
     const start = Date.now();
     const roll_results = [ -12, -17, -20, -23, -16, -29 ];
-    for (let i=10000000; i--;) {
+    for (let i=100000000; i--;) {
         //board.is_column_full(1, 1);
         //insertion_sort([ -12, -17, -20, -23, -16, -29 ]);
         //board.is_game_over()
-        board.eval()
+        //board.eval()
+        const arr = new Array(6);
+        for (let i = 1; i < 7; ++i) {
+            arr[i-1] = i;
+        }
     }
     console.log("Test elapsed:", Math.round((Date.now() - start)));
 }
