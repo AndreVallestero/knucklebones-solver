@@ -12,8 +12,8 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
   - [x] (659ms, 70x speedup) profiling and optimizations 
   - [x] (260ms, 2.5x speedup) use flat array for grids
   - [x] ~~use [Uint8/16/32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays) which might let us leverage `.reduce()`~~ copying `TypedArray` is slower than `Array`
-  - [x] (100ms, 2.6x speedup) web worker / multithreading (split 3 top branches into its own webworker)
-  - [ ] implement functions as class prototype e.g `Array.prototype.eval = function () {}`
+  - [x] (130ms, 2x speedup) web worker / multithreading (split 3 top branches into its own webworker)
+  - [x] (110ms, 1.1x speedup) implement functions as class prototype e.g `Array.prototype.eval = function () {}`
   - [ ] configurable web worker / multithreading (4+ threads)
   - [ ] rewrite in rust -> wasm
   - [ ] tail call recursion optimization
