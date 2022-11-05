@@ -26,6 +26,7 @@ Or play PVP: https://knucklebones.jaredp.co.uk/pvp
 - [x] implement auto-place (button to automatically place the suggested position)
   - [x] this should also remove dice from the opponent's board if necessary
 - [x] add reset button
+- [ ] compare median vs mean by playing the solver against each other
 
 ## Reference Benchmark
 
