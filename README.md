@@ -46,3 +46,7 @@ After using a flat array for grids: Note, `clone_grids()` was removed and memcpy
 ![image](https://user-images.githubusercontent.com/39736205/200007470-b7b1c4ad-e7e7-4e9b-9e43-a62fa22823ee.png)
 
 While implementing web workers, I learned that class function are significantly faster than standalone functions if you're storing the data in the class. Because the workers used `structuredClone` to receive data, this would strip away the Board class so I decided making all the functions standalone. This classless implementation was 3x slower than the original. After some research, I found out that classes are able to JIT the function for the specific data types in its internal fields, which results in large performance gains. In the next version, I'm gonna try implementing the functions in the Array prototype to reduce indirection and improve performance.
+
+After class protype functions:
+![image](https://user-images.githubusercontent.com/39736205/200122414-b13ef622-a3d9-46e8-a394-74fe1f8a8638.png)
+
