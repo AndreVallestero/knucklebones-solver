@@ -104,8 +104,8 @@ const COLUMN_OFFSET = 6;
 // event[0] - board
 // event[1] - depth
 onmessage = function(event) {
-    const [grids, depth] = event.data;
-    postMessage(minimax(new Board(grids), depth, false));
+    const [board, depth] = event.data;
+    postMessage(minimax(board, depth, false));
 }
 
 function minimax(board, depth, maximizing_player) {
@@ -117,7 +117,7 @@ function minimax(board, depth, maximizing_player) {
             let highest_column_score = Number.NEGATIVE_INFINITY;
             for (let column_index = 0; column_index < 3; ++column_index) {
                 if (board.is_column_full(0, column_index)) continue;
-                const new_board = new Board(board.grids.slice());
+                const new_board = board.slice();
                 new_board.place(roll, 0, column_index);
                 highest_column_score = Math.max(highest_column_score, minimax(new_board, depth - 1, false));
             }
@@ -128,7 +128,7 @@ function minimax(board, depth, maximizing_player) {
             let lowest_column_score = Number.POSITIVE_INFINITY;
             for (let column_index = 0; column_index < 3; ++column_index) {
                 if (board.is_column_full(1, column_index)) continue;
-                const new_board = new Board(board.grids.slice());
+                const new_board = board.slice();
                 new_board.place(roll, 1, column_index);
                 lowest_column_score = Math.min(lowest_column_score, minimax(new_board, depth - 1, true));
             }
@@ -142,46 +142,40 @@ function minimax(board, depth, maximizing_player) {
     return (roll_scores[2] + roll_scores[3]) / 2;
 }
 
-class Board {
-    constructor(grids) {
-        this.grids = grids
-    }
+Array.prototype.is_game_over = function () {
+    return this.sum(0, GRID_OFFSET) == 9
+        || this.sum(GRID_OFFSET, GRID_OFFSET + GRID_OFFSET) == 9;
+}
 
-    is_game_over() {
-        return this.sum(0, GRID_OFFSET) == 9
-            || this.sum(GRID_OFFSET, GRID_OFFSET + GRID_OFFSET) == 9;
-    }
-
-    // Micro optimization, 2x faster than map + sum + eval_column
-    eval() {
-        let total = 0;
-        for (let i = 0; i < 3; ++i) {
-            for (let j = 0; j < 6; ++j) {
-                const offset = COLUMN_OFFSET * i + j;
-                total += (j + 1) * this.grids[offset] * this.grids[offset];
-                total -= (j + 1) * this.grids[GRID_OFFSET + offset] * this.grids[GRID_OFFSET + offset];
-            }
+// Micro optimization, 2x faster than map + sum + eval_column
+Array.prototype.eval = function ()  {
+    let total = 0;
+    for (let i = 0; i < 3; ++i) {
+        for (let j = 0; j < 6; ++j) {
+            const offset = COLUMN_OFFSET * i + j;
+            total += (j + 1) * this[offset] * this[offset];
+            total -= (j + 1) * this[GRID_OFFSET + offset] * this[GRID_OFFSET + offset];
         }
-        return total
     }
+    return total
+}
 
-    // micro optimization, 2x faster than reduce if a slice would've been required
-    sum(start, end) {
-        let total = 0;
-        for (; start < end; ++start)
-            total += this.grids[start];
-        return total
-    }
+// micro optimization, 2x faster than reduce if a slice would've been required
+Array.prototype.sum = function (start, end) {
+    let total = 0;
+    for (; start < end; ++start)
+        total += this[start];
+    return total
+}
 
-    is_column_full(grid_index, column_index) {
-        const offset = GRID_OFFSET * grid_index + COLUMN_OFFSET * column_index;
-        return this.sum(offset, offset + 6) == 3;
-    }
+Array.prototype.is_column_full = function (grid_index, column_index) {
+    const offset = GRID_OFFSET * grid_index + COLUMN_OFFSET * column_index;
+    return this.sum(offset, offset + 6) == 3;
+}
 
-    place(number, grid_index, column_index) {
-        ++this.grids[GRID_OFFSET * grid_index + COLUMN_OFFSET * column_index + number - 1]; // +1 to selected grid
-        this.grids[GRID_OFFSET * (1 - grid_index) + COLUMN_OFFSET * column_index + number - 1] = 0; // reset other grid counter
-    }
+Array.prototype.place = function (number, grid_index, column_index) {
+    ++this[GRID_OFFSET * grid_index + COLUMN_OFFSET * column_index + number - 1]; // +1 to selected grid
+    this[GRID_OFFSET * (1 - grid_index) + COLUMN_OFFSET * column_index + number - 1] = 0; // reset other grid counter
 }
 
 // micro optimization, 4x faster than arr.sort() for n=6
@@ -209,7 +203,7 @@ async function btn_solve_clicked() {
     else depth = parseInt(depth_string)
 
     // 36 = 2 grids * 3 columns * 6 counters
-    const board = new Board(new Array(36).fill(0));
+    const board = new Array(36).fill(0);
     for (let grid_index = 0; grid_index < 2; ++grid_index) {
         const rows = document.getElementById("grid" + grid_index).lastChild.children;
         for (const row of rows) {
@@ -229,9 +223,9 @@ async function btn_solve_clicked() {
             worker_promises.push(Number.NEGATIVE_INFINITY);
             continue; // skip full column
         }
-        const new_board = new Board(board.grids.slice());
+        const new_board = board.slice();
         new_board.place(roll, 0, column_index);
-        worker_promises.push(worker_solve(workers[column_index], new_board.grids, depth));
+        worker_promises.push(worker_solve(workers[column_index], new_board, depth));
     }
     const worker_results = await Promise.all(worker_promises);
     const best_column_score = Math.max(...worker_results);
@@ -257,15 +251,13 @@ const workers = [new Worker(blob_url), new Worker(blob_url), new Worker(blob_url
 
 
 function test() {
-    const grids = [
+    const board = [
         0,0,0,0,0,2, 0,0,0,0,0,0, 0,0,0,0,0,0,
         0,0,0,0,0,0, 1,0,1,0,1,0, 0,1,0,1,0,0];
-    const board = new Board(grids);
     const start = Date.now();
     const roll_results = [ -12, -17, -20, -23, -16, -29 ];
     for (let i=10000000; i--;) {
         //board.is_column_full(1, 1);
-        //const a = grids !== undefined ? grids : new Array(36).fill(0);
         //insertion_sort([ -12, -17, -20, -23, -16, -29 ]);
         //board.is_game_over()
         board.eval()
