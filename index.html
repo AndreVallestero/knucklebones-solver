@@ -181,11 +181,11 @@ Array.prototype.place = function (number, grid_index, column_index) {
 // micro optimization, 4x faster than arr.sort() for n=6
 function insertion_sort(arr) {
     for(let i=1; i<6; ++i) {
-		const value = arr[i];
-		for (var j=i-1; 0 <= j && arr[j] <= value; j--) 
-			arr[j+1] = arr[j];
-		arr[j+1] = value;
-	}
+        const value = arr[i];
+        for (var j=i-1; 0 <= j && arr[j] <= value; j--) 
+            arr[j+1] = arr[j];
+        arr[j+1] = value;
+    }
 }
 </script>
 
@@ -225,6 +225,7 @@ async function btn_solve_clicked() {
         }
         const new_board = board.slice();
         new_board.place(roll, 0, column_index);
+        //worker_promises.push(minimax(new_board, depth, false)); // single threaded mode
         worker_promises.push(worker_solve(workers[column_index], new_board, depth));
     }
     const worker_results = await Promise.all(worker_promises);
