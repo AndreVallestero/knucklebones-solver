@@ -153,8 +153,8 @@ Array.prototype.eval = function ()  {
     for (let i = 0; i < 3; ++i) {
         for (let j = 0; j < 6; ++j) {
             const offset = COLUMN_OFFSET * i + j;
-            total += (j + 1) * this[offset] * this[offset];
-            total -= (j + 1) * this[GRID_OFFSET + offset] * this[GRID_OFFSET + offset];
+            total += (j + 1) * (this[offset] * this[offset]
+                - this[GRID_OFFSET + offset] * this[GRID_OFFSET + offset]);
         }
     }
     return total
@@ -256,15 +256,15 @@ function test() {
         0,0,0,0,0,0, 1,0,1,0,1,0, 0,1,0,1,0,0];
     const start = Date.now();
     const roll_results = [ -12, -17, -20, -23, -16, -29 ];
-    for (let i=100000000; i--;) {
+    for (let i=10000000; i--;) {
         //board.is_column_full(1, 1);
         //insertion_sort([ -12, -17, -20, -23, -16, -29 ]);
         //board.is_game_over()
-        //board.eval()
-        const arr = new Array(6);
-        for (let i = 1; i < 7; ++i) {
-            arr[i-1] = i;
-        }
+        board.eval()
+        //const arr = new Array(6);
+        // for (let i = 1; i < 7; ++i) {
+        //     arr[i-1] = i;
+        // }
     }
     console.log("Test elapsed:", Math.round((Date.now() - start)));
 }
