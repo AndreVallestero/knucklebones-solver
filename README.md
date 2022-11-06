@@ -61,5 +61,6 @@ Results of the standard algorithm (mean depth 5) compared to some other methods 
 | Mean Depth 2 | 42 | 2 |
 | Naive (Depth 0) | 29 | 1 |
 | Random | 12 | 2 |
+
 *tested over 1000 games
 
