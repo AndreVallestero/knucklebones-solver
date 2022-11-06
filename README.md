@@ -1,5 +1,5 @@
 # knucklebones-solver
-Knucklebones Solver using minimax and median-weighting for random probabilities
+Knucklebones Solver using minimax and mean-weighting for random probabilities
 
 Check it out here: https://andrevallestero.github.io/knucklebones-solver/
 
