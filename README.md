@@ -53,7 +53,7 @@ While implementing web workers, I learned that class function are significantly 
 After class protype functions:
 ![image](https://user-images.githubusercontent.com/39736205/200122414-b13ef622-a3d9-46e8-a394-74fe1f8a8638.png)
 
-Results of the standard algorithm (mean depth 5) compared to some other methods in 100 games with alternating starts:
+Results of other methods compared to the standard algorithm (mean depth 5) in 100 games with alternating starts:
 | Method | Wins | Ties |
 |---|---|---|
 | Median Depth 5* | 45 | 1 |
