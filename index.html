@@ -138,11 +138,8 @@ function minimax(board, depth, maximizing_player) {
         }
     }
 
-    //return roll_scores.reduce((a, b) => a + b, 0) / 6;
-    // median score for each roll given best dice position
-    // prefer median over mean for heavy tailed distributions
-    insertion_sort(roll_scores);
-    return (roll_scores[2] + roll_scores[3]) / 2;
+    // mean: 550 wins, median: 450 wins
+    return roll_scores.reduce((a, b) => a + b, 0) / 6;
 }
 
 Array.prototype.is_game_over = function () {
@@ -179,16 +176,6 @@ Array.prototype.is_column_full = function (grid_index, column_index) {
 Array.prototype.place = function (number, grid_index, column_index) {
     ++this[GRID_OFFSET * grid_index + COLUMN_OFFSET * column_index + number - 1]; // +1 to selected grid
     this[GRID_OFFSET * (1 - grid_index) + COLUMN_OFFSET * column_index + number - 1] = 0; // reset other grid counter
-}
-
-// micro optimization, 4x faster than arr.sort() for n=6
-function insertion_sort(arr) {
-    for(let i=1; i<6; ++i) {
-        const value = arr[i];
-        for (var j=i-1; 0 <= j && arr[j] <= value; j--) 
-            arr[j+1] = arr[j];
-        arr[j+1] = value;
-    }
 }
 </script>
 
@@ -313,6 +300,10 @@ function btn_place_clicked() {
 
 }
 
+// ########################################################
+// EVERYTHING BELOW THIS POINT IS FOR TESTING PURPOSES ONLY
+// ########################################################
+
 function test() {
     const board = [
         0,0,0,0,0,2, 0,0,0,0,0,0, 0,0,0,0,0,0,
@@ -330,5 +321,116 @@ function test() {
         // }
     }
     console.log("Test elapsed:", Math.round((Date.now() - start)));
+}
+
+function compete(first) {
+
+    function solve(board, roll, swapped) {
+        let best_score = -Infinity;
+        let best_column = null;
+        for (let column_index = 0; column_index < 3; ++column_index) {
+            if (board.is_column_full(0, column_index)) continue;
+            const new_board = board.slice();
+            new_board.place(roll, 0, column_index);
+            //const method = !swapped ? minimax : minimax_median;
+            //const score = method(new_board, 5, false);
+            const score = !swapped
+                ? minimax(new_board, 5, false)
+                : minimax(new_board, 4, false); // Math.random(); 
+            if (score > best_score) {
+                best_score = score;
+                best_column = column_index;
+            }
+        }
+        return best_column;
+    }
+
+    let board = [
+        0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0,
+        0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0];
+    let swapped = false;
+
+    // If first = true, median goes first
+    if (!first) {
+        board = board.slice(18).concat(board.slice(0, 18)); // swap
+        swapped = !swapped;
+    }
+
+    while (!board.is_game_over()) {
+        board = board.slice(18).concat(board.slice(0, 18)); // swap
+        swapped = !swapped;
+        const roll = Math.floor(Math.random() * 6) + 1;
+        const best_column = solve(board, roll, swapped)
+        board.place(roll, 0, best_column);
+    }
+
+    let final_score = board.eval()
+    if (swapped) final_score *= -1;
+    if (final_score > 0) {
+        console.log("standard win", final_score)
+        return 0
+    } else if (final_score < 0) {
+        console.log("alt method win", final_score)
+        return 1
+    } else {
+        console.log("tie", final_score)
+        return 2
+    }
+}
+
+function minimax_median(board, depth, maximizing_player) {
+    if (depth == 0 || board.is_game_over()) return board.eval();
+
+    const roll_scores = new Array(6);
+    if (maximizing_player) {
+        for (let roll = 1; roll < 7; ++roll) {
+            let highest_column_score = Number.NEGATIVE_INFINITY;
+            for (let column_index = 0; column_index < 3; ++column_index) {
+                if (board.is_column_full(0, column_index)) continue;
+                const new_board = board.slice();
+                new_board.place(roll, 0, column_index);
+                highest_column_score = Math.max(highest_column_score, minimax_median(new_board, depth - 1, false));
+            }
+            roll_scores[roll-1] = highest_column_score;
+        }
+    } else {
+        for (let roll = 1; roll < 7; ++roll) {
+            let lowest_column_score = Number.POSITIVE_INFINITY;
+            for (let column_index = 0; column_index < 3; ++column_index) {
+                if (board.is_column_full(1, column_index)) continue;
+                const new_board = board.slice();
+                new_board.place(roll, 1, column_index);
+                lowest_column_score = Math.min(lowest_column_score, minimax_median(new_board, depth - 1, true));
+            }
+            roll_scores[roll-1] = lowest_column_score;
+        }
+    }
+
+    insertion_sort(roll_scores);
+    return (roll_scores[2] + roll_scores[3]) / 2;
+}
+
+function compete_series(n) {
+    const results = [0, 0, 0]
+    for (let i = 0; i < n; ++i)
+        ++results[compete(Boolean(i%2))];
+    console.log("standard wins:", results[0], "\nalt method wins:", results[1], "\nties:", results[2]);
+}
+
+// micro optimization, 4x faster than arr.sort() for n=6
+function insertion_sort(arr) {
+    for(let i=1; i<6; ++i) {
+        const value = arr[i];
+        for (var j=i-1; 0 <= j && arr[j] <= value; j--) 
+            arr[j+1] = arr[j];
+        arr[j+1] = value;
+    }
+}
+
+function solve_random(board){
+    var col = Math.floor(Math.random() * 3);
+    while(board.is_column_full(0, col))
+        col = Math.floor(Math.random() * 3);
+    return col
 }
 </script>
