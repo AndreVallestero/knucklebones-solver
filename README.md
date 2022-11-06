@@ -26,7 +26,7 @@ Or play PVP: https://knucklebones.jaredp.co.uk/pvp
 - [x] implement auto-place (button to automatically place the suggested position)
   - [x] this should also remove dice from the opponent's board if necessary
 - [x] add reset button
-- [ ] compare median vs mean by playing the solver against each other
+- [x] compare median vs mean by playing the solver against each other
 
 ## Reference Benchmark
 
@@ -52,4 +52,14 @@ While implementing web workers, I learned that class function are significantly 
 
 After class protype functions:
 ![image](https://user-images.githubusercontent.com/39736205/200122414-b13ef622-a3d9-46e8-a394-74fe1f8a8638.png)
+
+Results of the standard algorithm (mean depth 5) compared to some other methods in 100 games with alternating starts:
+| Method | Wins | Ties |
+|---|---|---|
+| Median Depth 5* | 45 | 2 |
+| Mean Depth 4* | 48 | 2 |
+| Mean Depth 2 | 42 | 2 |
+| Naive (Depth 0) | 29 | 1 |
+| Random | 12 | 2 |
+*tested over 1000 games
 
