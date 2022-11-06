@@ -56,6 +56,7 @@ After class protype functions:
 Results of other methods compared to the standard algorithm (mean depth 5) in 100 games with alternating starts:
 | Method | Wins | Ties |
 |---|---|---|
+| Mean Depth 6 | 49 | 3 |
 | Median Depth 5* | 45 | 1 |
 | Mean Depth 4* | 48 | 1 |
 | Mean Depth 2 | 42 | 2 |
