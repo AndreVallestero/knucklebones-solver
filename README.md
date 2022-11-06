@@ -8,7 +8,7 @@ Test it in game here: https://knucklebones.jaredp.co.uk/
 Or play PVP: https://knucklebones.jaredp.co.uk/pvp
 
 ## TODO
-- optimize
+- [ ] optimize
   - [x] (45421ms) baseline
   - [x] ~~{40x speedup} alpha beta pruning~~ (not possible due to roll median algorithm)
   - [x] (659ms, 70x speedup) profiling and optimizations 
@@ -63,4 +63,3 @@ Results of other methods compared to the standard algorithm (mean depth 5) in 10
 | Random | 12 | 2 |
 
 *tested over 1000 games
-
