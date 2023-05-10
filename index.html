@@ -90,6 +90,7 @@
 <script id="worker_script">
 const GRID_OFFSET = 18;
 const COLUMN_OFFSET = 6;
+const MAX_BOARD_VALUE = 162;
 /*
  * board is a flattened array of 36 unsigned ints
  * board is made out of 2 grids
@@ -111,7 +112,12 @@ onmessage = function(event) {
 }
 
 function minimax(board, depth, maximizing_player) {
-    if (depth == 0 || board.is_game_over()) return board.eval();
+    if (board.is_game_over()) {
+        const result = board.eval();
+        if (!result) return 0;
+        return result > 0 ? MAX_BOARD_VALUE : -MAX_BOARD_VALUE;
+    }
+    if (depth == 0) return board.eval();
 
     const roll_scores = new Array(6);
     if (maximizing_player) {
