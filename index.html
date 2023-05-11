@@ -248,8 +248,8 @@ async function btn_solve_clicked() {
     btn_place.style="display:inline"
     txt_depth.innerText = depth;
     const expected_score = Math.round(best_column_score * 100) / 100;
-    if (expected_score >= MAX_BOARD_VALUE) txt_score.innerText = "win"
-    else if (expected_score <= -MAX_BOARD_VALUE) txt_score.innerText = "lose"
+    if (expected_score >= MAX_BOARD_VALUE) txt_score.innerText = "win by " + (expected_score - MAX_BOARD_VALUE);
+    else if (expected_score <= -MAX_BOARD_VALUE) txt_score.innerText = "lose" + (expected_score + MAX_BOARD_VALUE);
     else txt_score.innerText = expected_score;
 }
 
