@@ -115,7 +115,7 @@ function minimax(board, depth, maximizing_player) {
     if (board.is_game_over()) {
         const result = board.eval();
         if (!result) return 0;
-        return result > 0 ? MAX_BOARD_VALUE : -MAX_BOARD_VALUE;
+        return result > 0 ? result + MAX_BOARD_VALUE : result - MAX_BOARD_VALUE;
     }
     if (depth == 0) return board.eval();
 
