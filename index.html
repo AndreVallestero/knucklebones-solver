@@ -247,10 +247,10 @@ async function btn_solve_clicked() {
     btn_place.disabled = false;
     btn_place.style="display:inline"
     txt_depth.innerText = depth;
-    let expected_score = best_column_score;
-    if (best_column_score >= MAX_BOARD_VALUE) expected_score = "win by " + (expected_score - MAX_BOARD_VALUE);
-    else if (best_column_score <= -MAX_BOARD_VALUE) expected_score = "lose by " + (expected_score  + MAX_BOARD_VALUE);
-    txt_score.innerText = Math.round(expected_score * 100) / 100;
+    if (best_column_score >= MAX_BOARD_VALUE)
+		txt_score.innerText = "win by " + Math.round((best_column_score - MAX_BOARD_VALUE) * 100) / 100;
+	else if (best_column_score <= -MAX_BOARD_VALUE)
+		txt_score.innerText = "lose by " + Math.round((best_column_score + MAX_BOARD_VALUE) * 100) / 100;
 }
 
 function worker_solve(worker, board, depth) {
