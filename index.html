@@ -252,7 +252,7 @@ async function btn_solve_clicked() {
     else if (best_column_score <= -MAX_BOARD_VALUE)
         txt_score.innerText = "lose by " + Math.round((best_column_score + MAX_BOARD_VALUE) * 100) / 100;
     else
-        txt_score.innerText = Math.round((best_column_score - MAX_BOARD_VALUE) * 100) / 100;
+        txt_score.innerText = Math.round(best_column_score * 100) / 100;
 }
 
 function worker_solve(worker, board, depth) {
